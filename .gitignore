@@ -1,0 +1,23 @@
+# Compiled simulation binaries
+bp_sim
+*.out
+
+# Waveform dumps
+*.vcd
+*.vvp
+
+# Synthesis outputs
+synthesis_output/
+output/
+reports/
+
+# Zip archives
+*.zip
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~

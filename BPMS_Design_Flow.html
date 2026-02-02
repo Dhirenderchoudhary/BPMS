@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPMS Chip - Design Flow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; color: #00d9ff; font-size: 2.5em; }
+        h2 { color: #00d9ff; margin: 20px 0 15px; border-bottom: 2px solid #00d9ff; padding-bottom: 5px; }
+        
+        /* Block Diagram */
+        .block-diagram {
+            background: #0f0f23;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #00d9ff;
+        }
+        .chip-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .external-block {
+            background: linear-gradient(145deg, #2d2d44, #1a1a2e);
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 15px 20px;
+            text-align: center;
+            min-width: 120px;
+        }
+        .arrow {
+            font-size: 2em;
+            color: #00d9ff;
+        }
+        .chip {
+            background: linear-gradient(145deg, #1e3a5f, #0d2137);
+            border: 3px solid #00d9ff;
+            border-radius: 15px;
+            padding: 25px;
+            min-width: 600px;
+        }
+        .chip-title {
+            text-align: center;
+            font-size: 1.3em;
+            color: #00d9ff;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .module {
+            background: linear-gradient(145deg, #2d4a6f, #1a3a5c);
+            border: 2px solid #4ecdc4;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .module-name { font-weight: bold; color: #4ecdc4; }
+        .module-desc { font-size: 0.8em; color: #aaa; margin-top: 5px; }
+        .outputs {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #4ecdc4;
+        }
+        .output {
+            background: #1a3a5c;
+            border: 2px solid #ffd93d;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+        }
+        
+        /* Signal Flow */
+        .signal-flow {
+            background: #0f0f23;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #4ecdc4;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: linear-gradient(90deg, #1a3a5c, transparent);
+            border-left: 4px solid #4ecdc4;
+            border-radius: 0 10px 10px 0;
+        }
+        .step-num {
+            background: #4ecdc4;
+            color: #0f0f23;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        .step-content { flex: 1; }
+        .step-title { font-weight: bold; color: #4ecdc4; }
+        .step-desc { color: #aaa; font-size: 0.9em; }
+        
+        /* State Machine */
+        .state-machine {
+            background: #0f0f23;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #ffd93d;
+        }
+        .states {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .state {
+            background: linear-gradient(145deg, #3d3d5c, #2a2a3e);
+            border: 3px solid #ffd93d;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-align: center;
+        }
+        .state-arrow {
+            font-size: 1.5em;
+            color: #ffd93d;
+        }
+        .state-label {
+            text-align: center;
+            font-size: 0.8em;
+            color: #aaa;
+            margin-top: 10px;
+        }
+        
+        /* Waveform */
+        .waveform {
+            background: #0f0f23;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #ff6b6b;
+        }
+        .wave-svg { width: 100%; height: 200px; }
+        
+        /* ASIC Flow */
+        .asic-flow {
+            background: #0f0f23;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid #9b59b6;
+        }
+        .flow-stages {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .stage {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+        .stage-box {
+            background: linear-gradient(145deg, #4a3a6f, #2d2450);
+            border: 2px solid #9b59b6;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .stage-box.current {
+            border-color: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        .stage-num {
+            background: #9b59b6;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            margin-bottom: 8px;
+        }
+        .stage-name { font-weight: bold; color: #9b59b6; }
+        .stage-tool { font-size: 0.8em; color: #aaa; }
+        .stage-arrow-h {
+            color: #9b59b6;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        
+        /* Specs Table */
+        .specs {
+            background: #0f0f23;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #00d9ff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a3e;
+        }
+        th { background: #1a3a5c; color: #00d9ff; }
+        tr:hover { background: #1a1a2e; }
+        
+        /* Print styles */
+        @media print {
+            body { background: white; color: black; }
+            .block-diagram, .signal-flow, .state-machine, .waveform, .asic-flow, .specs {
+                border-color: #333;
+                background: #f5f5f5;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🫀 BPMS Chip - Design Flow</h1>
+        <p style="text-align: center; color: #aaa; margin-bottom: 30px;">Blood Pressure Monitoring System - Complete Architecture</p>
+        
+        <!-- Block Diagram -->
+        <h2>📦 System Block Diagram</h2>
+        <div class="block-diagram">
+            <div class="chip-container">
+                <div class="external-block">
+                    <div>🔴</div>
+                    <div><strong>BP Sensor</strong></div>
+                    <div style="font-size: 0.8em; color: #aaa;">Analog</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="external-block">
+                    <div>ADC</div>
+                    <div><strong>ADC</strong></div>
+                    <div style="font-size: 0.8em; color: #aaa;">12-bit</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="chip">
+                    <div class="chip-title">bp_monitor_system</div>
+                    <div class="modules">
+                        <div class="module">
+                            <div class="module-name">FIR Filter</div>
+                            <div class="module-desc">8-tap moving avg</div>
+                        </div>
+                        <div class="module">
+                            <div class="module-name">State Machine</div>
+                            <div class="module-desc">Measurement control</div>
+                        </div>
+                        <div class="module">
+                            <div class="module-name">Peak Detector</div>
+                            <div class="module-desc">Max/Min tracking</div>
+                        </div>
+                        <div class="module">
+                            <div class="module-name">HR Calculator</div>
+                            <div class="module-desc">Threshold crossing</div>
+                        </div>
+                        <div class="module">
+                            <div class="module-name">ADC to BP</div>
+                            <div class="module-desc">mmHg conversion</div>
+                        </div>
+                        <div class="module">
+                            <div class="module-name">Alert Logic</div>
+                            <div class="module-desc">High/Low detect</div>
+                        </div>
+                    </div>
+                    <div class="outputs">
+                        <div class="output">systolic_bp [7:0]</div>
+                        <div class="output">diastolic_bp [7:0]</div>
+                        <div class="output">heart_rate [7:0]</div>
+                        <div class="output">high_alert</div>
+                        <div class="output">low_alert</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Signal Flow -->
+        <h2>🔄 Signal Processing Flow</h2>
+        <div class="signal-flow">
+            <div class="flow-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <div class="step-title">ADC Input</div>
+                    <div class="step-desc">adc_data[11:0] + adc_valid → Raw 12-bit samples from sensor (0-4095)</div>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <div class="step-title">Noise Filtering (FIR)</div>
+                    <div class="step-desc">8-tap moving average: output = (sum of 8 samples) / 8 → Removes high-frequency noise</div>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <div class="step-title">Peak Detection</div>
+                    <div class="step-desc">Track running_max (systolic) and running_min (diastolic) over 1200 samples</div>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <div class="step-title">Heart Rate Calculation</div>
+                    <div class="step-desc">Count threshold crossings → HR = peak_count × 5 (for 12-sec window)</div>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                    <div class="step-title">ADC to mmHg Conversion</div>
+                    <div class="step-desc">bp_mmhg = (adc × 67) >> 10 → Maps ADC values to blood pressure</div>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">6</div>
+                <div class="step-content">
+                    <div class="step-title">Alert Generation</div>
+                    <div class="step-desc">HIGH: sys≥140 OR dia≥90 | LOW: sys≤90 OR dia≤60</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- State Machine -->
+        <h2>🔀 State Machine</h2>
+        <div class="state-machine">
+            <div class="states">
+                <div>
+                    <div class="state">IDLE</div>
+                    <div class="state-label">Wait for data</div>
+                </div>
+                <div class="state-arrow">→<br><span style="font-size: 0.5em;">filter_valid</span></div>
+                <div>
+                    <div class="state">MEASURING</div>
+                    <div class="state-label">1200 samples</div>
+                </div>
+                <div class="state-arrow">→<br><span style="font-size: 0.5em;">count=1199</span></div>
+                <div>
+                    <div class="state">DONE</div>
+                    <div class="state-label">Output results</div>
+                </div>
+                <div class="state-arrow">→<br><span style="font-size: 0.5em;">auto</span></div>
+                <div style="font-size: 1.5em; color: #ffd93d;">↩️ IDLE</div>
+            </div>
+        </div>
+        
+        <!-- Blood Pressure Waveform -->
+        <h2>📈 Blood Pressure Waveform</h2>
+        <div class="waveform">
+            <svg class="wave-svg" viewBox="0 0 800 200">
+                <!-- Grid -->
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#2a2a3e" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="800" height="200" fill="url(#grid)"/>
+                
+                <!-- Threshold line -->
+                <line x1="0" y1="100" x2="800" y2="100" stroke="#ffd93d" stroke-dasharray="5,5" stroke-width="2"/>
+                <text x="10" y="95" fill="#ffd93d" font-size="12">Threshold (50%)</text>
+                
+                <!-- BP Waveform -->
+                <path d="M 0 150 
+                         Q 40 150 50 80 
+                         Q 60 30 80 60 
+                         Q 100 90 120 150
+                         Q 160 150 170 80 
+                         Q 180 30 200 60 
+                         Q 220 90 240 150
+                         Q 280 150 290 80 
+                         Q 300 30 320 60 
+                         Q 340 90 360 150
+                         Q 400 150 410 80 
+                         Q 420 30 440 60 
+                         Q 460 90 480 150
+                         Q 520 150 530 80 
+                         Q 540 30 560 60 
+                         Q 580 90 600 150
+                         Q 640 150 650 80 
+                         Q 660 30 680 60 
+                         Q 700 90 720 150
+                         L 800 150" 
+                      fill="none" stroke="#ff6b6b" stroke-width="3"/>
+                
+                <!-- Labels -->
+                <text x="70" y="25" fill="#ff6b6b" font-size="12" font-weight="bold">Systolic (Max)</text>
+                <text x="120" y="170" fill="#4ecdc4" font-size="12" font-weight="bold">Diastolic (Min)</text>
+                
+                <!-- Peak markers -->
+                <circle cx="60" cy="30" r="5" fill="#ff6b6b"/>
+                <circle cx="180" cy="30" r="5" fill="#ff6b6b"/>
+                <circle cx="300" cy="30" r="5" fill="#ff6b6b"/>
+                <circle cx="420" cy="30" r="5" fill="#ff6b6b"/>
+                <circle cx="540" cy="30" r="5" fill="#ff6b6b"/>
+                <circle cx="660" cy="30" r="5" fill="#ff6b6b"/>
+                
+                <!-- Axis labels -->
+                <text x="750" y="195" fill="#aaa" font-size="12">Time →</text>
+                <text x="5" y="15" fill="#aaa" font-size="12">Pressure ↑</text>
+            </svg>
+        </div>
+        
+        <!-- Specifications -->
+        <h2>Design Specifications</h2>
+        <div class="specs">
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Clock Frequency</td>
+                    <td>10 MHz</td>
+                    <td>100ns period</td>
+                </tr>
+                <tr>
+                    <td>ADC Width</td>
+                    <td>12 bits</td>
+                    <td>0-4095 range</td>
+                </tr>
+                <tr>
+                    <td>Output Width</td>
+                    <td>8 bits</td>
+                    <td>0-255 mmHg</td>
+                </tr>
+                <tr>
+                    <td>FIR Taps</td>
+                    <td>8</td>
+                    <td>Moving average filter</td>
+                </tr>
+                <tr>
+                    <td>Sample Count</td>
+                    <td>1200</td>
+                    <td>Per measurement window</td>
+                </tr>
+                <tr>
+                    <td>Measurement Time</td>
+                    <td>~12 seconds</td>
+                    <td>At 100 samples/sec</td>
+                </tr>
+                <tr>
+                    <td>High BP Threshold</td>
+                    <td>≥140/90 mmHg</td>
+                    <td>Systolic/Diastolic</td>
+                </tr>
+                <tr>
+                    <td>Low BP Threshold</td>
+                    <td>≤90/60 mmHg</td>
+                    <td>Systolic/Diastolic</td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- ASIC Flow -->
+        <h2>🏭 ASIC Implementation Flow</h2>
+        <div class="asic-flow">
+            <div class="flow-stages">
+                <div class="stage">
+                    <div class="stage-box current">
+                        <div class="stage-num">1</div>
+                        <div class="stage-name">RTL Design</div>
+                        <div class="stage-tool">Verilog</div>
+                    </div>
+                    <div style="color: #00ff00; font-size: 0.8em;">✓ Complete</div>
+                </div>
+                <div class="stage-arrow-h">→</div>
+                <div class="stage">
+                    <div class="stage-box current">
+                        <div class="stage-num">2</div>
+                        <div class="stage-name">Simulation</div>
+                        <div class="stage-tool">Icarus Verilog</div>
+                    </div>
+                    <div style="color: #00ff00; font-size: 0.8em;">✓ All tests pass</div>
+                </div>
+                <div class="stage-arrow-h">→</div>
+                <div class="stage">
+                    <div class="stage-box">
+                        <div class="stage-num">3</div>
+                        <div class="stage-name">Synthesis</div>
+                        <div class="stage-tool">Cadence Genus</div>
+                    </div>
+                    <div style="color: #ffd93d; font-size: 0.8em;">Next step</div>
+                </div>
+                <div class="stage-arrow-h">→</div>
+                <div class="stage">
+                    <div class="stage-box">
+                        <div class="stage-num">4</div>
+                        <div class="stage-name">Place & Route</div>
+                        <div class="stage-tool">Cadence Innovus</div>
+                    </div>
+                </div>
+                <div class="stage-arrow-h">→</div>
+                <div class="stage">
+                    <div class="stage-box">
+                        <div class="stage-num">5</div>
+                        <div class="stage-name">Signoff</div>
+                        <div class="stage-tool">DRC/LVS/STA</div>
+                    </div>
+                </div>
+                <div class="stage-arrow-h">→</div>
+                <div class="stage">
+                    <div class="stage-box">
+                        <div class="stage-num">6</div>
+                        <div class="stage-name">Tape-out</div>
+                        <div class="stage-tool">GDSII</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <p style="text-align: center; margin-top: 30px; color: #aaa;">
+            💾 Right-click → Save As → Save as PNG or PDF<br>
+            Or use browser Print (Ctrl+P) to save as PDF
+        </p>
+    </div>
+</body>
+</html>
